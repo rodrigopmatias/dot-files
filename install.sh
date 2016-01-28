@@ -1,15 +1,14 @@
 #
 #
 #
-source settings.sh
+source $DOT_FILES_HOME/settings.sh
 
 REPO="git@github.com:rodrigopmatias/dot-files.git"
 
-function __path_git
+function GIT_BINARY
 {
-    GIT_PATH=$(type -p git)
-
-    return $GIT_PATH
+    git_binary=$(type -p git)
+    return $git_binary
 }
 
 function dotupdate
@@ -19,7 +18,7 @@ function dotupdate
         echo "run dotinstall"
     else
         echo "dot files installed!!!"
-        gitbin=__path_git
+        gitbin=GIT_BINARY
 
         if [ "$gitbin" != "" ]; then
             echo "ok, update"
@@ -37,7 +36,7 @@ function dotinstall
 {
     if [ ! -d $DOT_FILES_HOME ]; then
         echo "dotfiles not installed!!!"
-        gitbin=__path_git
+        gitbin=GIT_BINARY
 
         if [ "$gitbin" != "" ]; then
             echo "ok, install"

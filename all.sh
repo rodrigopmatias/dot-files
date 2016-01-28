@@ -1,3 +1,5 @@
 # load all modules
-source core.sh
-source install.sh
+DOT_FILES_HOME="$HOME/.dot-files"
+
+source $DOT_FILES_HOME/core.sh
+source $DOT_FILES_HOME/install.sh
