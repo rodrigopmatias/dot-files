@@ -11,8 +11,7 @@ Localize a variável *DOT_FILES_HOME* e informe o direório que háviamos locali
 
 O proximo passo é dizer para o bash carregar o nosso ambiente, iremos ediar o arquivo .bashrc que esta no home do seu usuário e adicone as seguintes linhas:
 
-<pre><code>
-source .dot-file-dir/settings.sh
+<pre><code>source .dot-file-dir/settings.sh
 source .dot-file-dir/all.sh
 </code></pre>
 
