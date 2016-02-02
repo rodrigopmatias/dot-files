@@ -9,6 +9,11 @@ function ___dotenvcheck
     fi
 }
 
+function doton
+{
+    dotenvon $@
+}
+
 function dotenvon
 {
     if [ $# -eq 1 ]; then
@@ -81,3 +86,4 @@ function ___dotenvlist_autocomplete
 }
 
 complete -F ___dotenvlist_autocomplete dotenvon
+complete -F ___dotenvlist_autocomplete doton

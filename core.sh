@@ -80,3 +80,45 @@ function dotvalue
         fi
     fi
 }
+
+function dotcd
+{
+    if [ $# -eq 1 ]; then
+        path=$(___dotdb "SELECT value FROM configtable WHERE attr='$1'")
+        if [ -d "$path" ]; then
+            cd $path
+        else
+            echo -e "O valor de \033[1m$1\033[0m não é um diretório."
+        fi
+    else
+        echo 'modo de uso:'
+        echo
+        echo '  $0 [varname]'
+    fi
+}
+
+function __dotcd_autocomplete_list
+{
+    list=""
+
+    for row in $(___dotdb "SELECT attr, value FROM configtable")
+    do
+        attr=$(echo $row | cut -d '|' -f 1)
+        value=$(echo $row | cut -d '|' -f 2)
+
+        if [ -d "$value" ]; then
+            list=$(echo "$list $attr")
+        fi
+    done
+
+    echo $list
+}
+
+function ___dotcd_autocomplete
+{
+    local current=${COMP_WORDS[COMP_CWORD]}
+    list=$(__dotcd_autocomplete_list)
+    COMPREPLY=( $(compgen -W "$list" $current ) )
+}
+
+complete -F ___dotcd_autocomplete dotcd
