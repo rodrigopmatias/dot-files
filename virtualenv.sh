@@ -9,12 +9,12 @@ function ___dotenvcheck
     fi
 }
 
-function doton
+function on
 {
     dotenvon $@
 }
 
-function dotenvon
+function envon
 {
     if [ $# -eq 1 ]; then
         path=$(___dotdb "SELECT value FROM configtable WHERE attr='$1'")
@@ -32,7 +32,7 @@ function dotenvon
     fi
 }
 
-function dotenvlist
+function envlist
 {
     for row in $(___dotdb "SELECT attr, value FROM configtable")
     do
@@ -85,5 +85,5 @@ function ___dotenvlist_autocomplete
     COMPREPLY=( $(compgen -W "$list" $current ) )
 }
 
-complete -F ___dotenvlist_autocomplete dotenvon
-complete -F ___dotenvlist_autocomplete doton
+complete -F ___dotenvlist_autocomplete envon
+complete -F ___dotenvlist_autocomplete on
