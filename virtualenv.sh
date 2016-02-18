@@ -11,7 +11,7 @@ function ___dotenvcheck
 
 function on
 {
-    dotenvon $@
+    envon $@
 }
 
 function envon
