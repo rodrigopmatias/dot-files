@@ -122,3 +122,8 @@ function ___dotcd_autocomplete
 }
 
 complete -F ___dotcd_autocomplete dotcd
+
+function dotstream
+{
+    tail -f --bytes=0 $@
+}

@@ -3,21 +3,31 @@ function pgclone {
     if [ $# -eq 2 ]; then
         from_db=$(echo $1 | cut -d '/' -f 2)
         from_user=$(echo $1 | cut -d '@' -f 1)
-        from_host=$(echo $1 | cut -d '@' -f 2 | cut -d '/' -f 1)
+        from_host=$(echo $1 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 1)
+        from_port=$(echo $1 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 2)
+
+        if [ "$from_port" == "" ]; then
+            $from_port=5432
+        fi
 
         to_db=$(echo $2 | cut -d '/' -f 2)
         to_user=$(echo $2 | cut -d '@' -f 1)
-        to_host=$(echo $2 | cut -d '@' -f 2 | cut -d '/' -f 1)
+        to_host=$(echo $2 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 1)
+        to_port=$(echo $2 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 2)
 
-        dropdb --if-exists -h $to_host -U $to_user $to_db 2>&1 1>/dev/null
-        createdb -h $to_host -U $to_user $to_db
-        pg_dump -h $from_host -U $from_user $from_db -O -x | psql -h $to_host -U $to_user $to_db
+        if [ "$to_port" == "" ]; then
+            $to_port=5432
+        fi
+
+        dropdb --if-exists -p $to_port -h $to_host -U $to_user $to_db 2>&1 1>/dev/null
+        createdb -p $to_port -h $to_host -U $to_user $to_db
+        pg_dump -p $from_port -h $from_host -U $from_user $from_db -O -x | psql  -p $to_port -h $to_host -U $to_user $to_db
     else
         echo ""
         echo "Modo de uso: "
         echo ""
         echo "  pgclone [source] [dest]"
-        echo "  pgclone user@host/dbsource user@host/dbdest"
+        echo "  pgclone user@host[:port]/dbsource user@host[:port]/dbdest"
         echo ""
     fi
 }
@@ -27,7 +37,12 @@ function pgload {
     if [ $# -eq 2 ]; then
         to_db=$(echo $2 | cut -d '/' -f 2)
         to_user=$(echo $2 | cut -d '@' -f 1)
-        to_host=$(echo $2 | cut -d '@' -f 2 | cut -d '/' -f 1)
+        to_host=$(echo $2 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 1)
+        to_port=$(echo $2 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 2)
+
+        if [ "$to_port" == "" ]; then
+            $to_port=5432
+        fi
 
         URL=$1
         ext=$(echo ${URL##*.})
@@ -54,19 +69,19 @@ function pgload {
                 ;;
         esac
 
-        dropdb --if-exists -h $to_host -U $to_user $to_db
-        createdb -h $to_host -U $to_user $to_db
+        dropdb --if-exists -p $to_port -h $to_host -U $to_user $to_db
+        createdb -p $to_port -h $to_host -U $to_user $to_db
         if [ "$url_type" == "remote" ]; then
             wget $URL -O- | $compress | psql -U $to_user -h $to_host $to_db
         else
-            $compress $URL | psql -U $to_user -h $to_host $to_db
+            $compress $URL | psql -p $to_port -U $to_user -h $to_host $to_db
         fi
     else
         echo ""
         echo "Modo de uso: "
         echo ""
         echo "  pgload [source] [dest]"
-        echo "  pgload http://localhost/dumps/db.gz user@host/dbdest"
+        echo "  pgload http://localhost/dumps/db.gz user@host[:port]/dbdest"
         echo ""
     fi
 }
