@@ -69,6 +69,18 @@ function pgload {
                 ;;
         esac
 
+        psql -p $to_port -h $to_host -U $to_user $to_db <<EOF
+SELECT
+    pg_terminate_backend(pid)
+FROM
+    pg_stat_activity
+WHERE
+    -- don't kill my own connection!
+    pid <> pg_backend_pid()
+    -- don't kill the connections to other databases
+    AND datname = '$to_db'
+    ;
+EOF
         dropdb --if-exists -p $to_port -h $to_host -U $to_user $to_db
         createdb -p $to_port -h $to_host -U $to_user $to_db
         if [ "$url_type" == "remote" ]; then
