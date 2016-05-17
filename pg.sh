@@ -84,7 +84,7 @@ EOF
         dropdb --if-exists -p $to_port -h $to_host -U $to_user $to_db
         createdb -p $to_port -h $to_host -U $to_user $to_db
         if [ "$url_type" == "remote" ]; then
-            wget $URL -O- | $compress | psql -U $to_user -h $to_host $to_db
+            wget $URL -O- --quiet | $compress | psql -U $to_user -h $to_host $to_db
         else
             $compress $URL | psql -p $to_port -U $to_user -h $to_host $to_db
         fi
