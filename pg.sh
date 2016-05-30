@@ -32,6 +32,34 @@ function pgclone {
     fi
 }
 
+function pgclose {
+    if [ $# -eq 1 ]; then
+        to_db=$(echo $1 | cut -d '/' -f 2)
+        to_user=$(echo $1 | cut -d '@' -f 1)
+        to_host=$(echo $1 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 1)
+        to_port=$(echo $1 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 2)
+
+        psql --output=/dev/null -p $to_port -h $to_host -U $to_user $to_db <<EOF
+SELECT
+    pg_terminate_backend(pid)
+FROM
+    pg_stat_activity
+WHERE
+    pid <> pg_backend_pid()
+    AND datname = '$to_db'
+    ;
+EOF
+        echo "pronto!!!"
+    else
+        echo ""
+        echo "Modo de uso: "
+        echo ""
+        echo "  pgclose [database]"
+        echo "  pglclose user@host[:port]/dbdest"
+        echo ""
+    fi
+}
+
 
 function pgload {
     if [ $# -eq 2 ]; then
@@ -69,18 +97,8 @@ function pgload {
                 ;;
         esac
 
-        psql -p $to_port -h $to_host -U $to_user $to_db <<EOF
-SELECT
-    pg_terminate_backend(pid)
-FROM
-    pg_stat_activity
-WHERE
-    -- don't kill my own connection!
-    pid <> pg_backend_pid()
-    -- don't kill the connections to other databases
-    AND datname = '$to_db'
-    ;
-EOF
+        pgclose $2
+
         dropdb --if-exists -p $to_port -h $to_host -U $to_user $to_db
         createdb -p $to_port -h $to_host -U $to_user $to_db
         if [ "$url_type" == "remote" ]; then
