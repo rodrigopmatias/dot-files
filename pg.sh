@@ -19,8 +19,9 @@ function pgclone {
             $to_port=5432
         fi
 
-        dropdb --if-exists -p $to_port -h $to_host -U $to_user $to_db 2>&1 1>/dev/null
-        createdb -p $to_port -h $to_host -U $to_user $to_db
+        pgclose $2
+        dropdb --if-exists -p $to_port -h $to_host -U $to_user -p $to_port $to_db 2>&1 1>/dev/null
+        createdb -p $to_port -h $to_host -U $to_user -p $to_port $to_db
         pg_dump -p $from_port -h $from_host -U $from_user $from_db -O -x | psql  -p $to_port -h $to_host -U $to_user $to_db
     else
         echo ""
@@ -39,7 +40,7 @@ function pgclose {
         to_host=$(echo $1 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 1)
         to_port=$(echo $1 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 2)
 
-        psql --output=/dev/null -p $to_port -h $to_host -U $to_user $to_db <<EOF
+        psql -p $to_port -h $to_host -U $to_user $to_db <<EOF
 SELECT
     pg_terminate_backend(pid)
 FROM
@@ -98,11 +99,11 @@ function pgload {
         esac
 
         pgclose $2
-
         dropdb --if-exists -p $to_port -h $to_host -U $to_user $to_db
         createdb -p $to_port -h $to_host -U $to_user $to_db
+
         if [ "$url_type" == "remote" ]; then
-            wget $URL -O- --quiet | $compress | psql -U $to_user -h $to_host $to_db
+            curl $URL | $compress | psql -U $to_user -p $to_port -h $to_host $to_db
         else
             $compress $URL | psql -p $to_port -U $to_user -h $to_host $to_db
         fi
