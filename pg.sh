@@ -6,8 +6,8 @@ function pgclone {
         from_host=$(echo $1 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 1)
         from_port=$(echo $1 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 2)
 
-        if [ "$from_port" == "" ]; then
-            $from_port=5432
+        if [ "$from_port" == "$from_host" ]; then
+            from_port=5432
         fi
 
         to_db=$(echo $2 | cut -d '/' -f 2)
@@ -15,8 +15,22 @@ function pgclone {
         to_host=$(echo $2 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 1)
         to_port=$(echo $2 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 2)
 
-        if [ "$to_port" == "" ]; then
-            $to_port=5432
+        if [ "$to_port" == "$to_host" ]; then
+            to_port=5432
+        fi
+
+        if [ "$DEBUG" ]; then
+            echo -e "\033[1mSource\033[0m"
+            echo -e "\033[1mHost:\033[0m $from_host"
+            echo -e "\033[1mPort:\033[0m $from_port"
+            echo -e "\033[1mUser:\033[0m $from_user"
+            echo -e "\033[1mDatabase:\033[0m $from_db"
+            echo ""
+            echo -e "\033[1mDestination\033[0m"
+            echo -e "\033[1mHost:\033[0m $to_host"
+            echo -e "\033[1mPort:\033[0m $to_port"
+            echo -e "\033[1mUser:\033[0m $to_user"
+            echo -e "\033[1mDatabase:\033[0m $to_db"
         fi
 
         pgclose $2
@@ -39,6 +53,10 @@ function pgclose {
         to_user=$(echo $1 | cut -d '@' -f 1)
         to_host=$(echo $1 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 1)
         to_port=$(echo $1 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 2)
+
+        if [ "$to_port" == "$to_host" ]; then
+            to_port=5432
+        fi
 
         psql -p $to_port -h $to_host -U $to_user $to_db <<EOF
 SELECT
@@ -69,8 +87,8 @@ function pgload {
         to_host=$(echo $2 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 1)
         to_port=$(echo $2 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 2)
 
-        if [ "$to_port" == "" ]; then
-            $to_port=5432
+        if [ "$to_port" == "$to_host" ]; then
+            to_port=5432
         fi
 
         URL=$1
@@ -97,6 +115,17 @@ function pgload {
                 return 1
                 ;;
         esac
+
+        if [ "$DEBUG" ]; then
+            echo -e "\033[1mSource\033[0m"
+            echo -e "\033[1mURL:\033[0m $URL"
+            echo ""
+            echo -e "\033[1mDestination\033[0m"
+            echo -e "\033[1mHost:\033[0m $to_host"
+            echo -e "\033[1mPort:\033[0m $to_port"
+            echo -e "\033[1mUser:\033[0m $to_user"
+            echo -e "\033[1mDatabase:\033[0m $to_db"
+        fi
 
         pgclose $2
         dropdb --if-exists -p $to_port -h $to_host -U $to_user $to_db
