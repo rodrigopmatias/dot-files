@@ -79,6 +79,83 @@ EOF
     fi
 }
 
+function pgdrop {
+    if [ $# -eq 1 ]; then
+        to_db=$(echo $1 | cut -d '/' -f 2)
+        to_user=$(echo $1 | cut -d '@' -f 1)
+        to_host=$(echo $1 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 1)
+        to_port=$(echo $1 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 2)
+
+        if [ "$to_port" == "$to_host" ]; then
+            to_port=5432
+        fi
+
+        pgclose $1
+        dropdb -U $to_user -h $to_host -p $to_port $to_db
+    else
+        echo ""
+        echo "Modo de uso: "
+        echo ""
+        echo "  pgdrop [database]"
+        echo "  pgdrop user@host[:port]/dbdest"
+        echo ""
+    fi
+}
+
+
+function pgcreate {
+    if [ $# -lt 3 ]; then
+        to_db=$(echo $1 | cut -d '/' -f 2)
+        to_user=$(echo $1 | cut -d '@' -f 1)
+        to_host=$(echo $1 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 1)
+        to_port=$(echo $1 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 2)
+
+        if [ "$to_port" == "$to_host" ]; then
+            to_port=5432
+        fi
+
+        if [ $# -eq 2 ]; then
+            createdb -U $to_user -h $to_host -p $to_port $to_db -T $2
+        else
+            createdb -U $to_user -h $to_host -p $to_port $to_db
+        fi
+    else
+        echo ""
+        echo "Modo de uso: "
+        echo ""
+        echo "  pgcreate [database]"
+        echo "  pgcreate [database] [template]"
+        echo "  pgcreate user@host[:port]/dbdest"
+        echo "  pgcreate user@host[:port]/dbdest template"
+        echo ""
+    fi
+}
+
+
+function pgrecreate {
+    if [ $# -lt 3 ]; then
+        to_db=$(echo $1 | cut -d '/' -f 2)
+        to_user=$(echo $1 | cut -d '@' -f 1)
+        to_host=$(echo $1 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 1)
+        to_port=$(echo $1 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 2)
+
+        if [ "$to_port" == "$to_host" ]; then
+            to_port=5432
+        fi
+
+        pgdrop $1
+        pgcreate $*
+    else
+        echo ""
+        echo "Modo de uso: "
+        echo ""
+        echo "  pgrecreate [database]"
+        echo "  pgrecreate [database] [template]"
+        echo "  pgrecreate user@host[:port]/dbdest"
+        echo "  pgrecreate user@host[:port]/dbdest template"
+        echo ""
+    fi
+}
 
 function pgload {
     if [ $# -eq 2 ]; then
