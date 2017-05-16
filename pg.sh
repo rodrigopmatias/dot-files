@@ -104,7 +104,7 @@ function pgdrop {
 
 
 function pgcreate {
-    if [ $# -lt 3 ]; then
+    if [ $# -gt 1 ]; then
         to_db=$(echo $1 | cut -d '/' -f 2)
         to_user=$(echo $1 | cut -d '@' -f 1)
         to_host=$(echo $1 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 1)
@@ -133,7 +133,7 @@ function pgcreate {
 
 
 function pgrecreate {
-    if [ $# -lt 3 ]; then
+    if [ $# -gt 1 ]; then
         to_db=$(echo $1 | cut -d '/' -f 2)
         to_user=$(echo $1 | cut -d '@' -f 1)
         to_host=$(echo $1 | cut -d '@' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 1)
