@@ -36,7 +36,7 @@ function pgclone {
         pgclose $2
         dropdb --if-exists -p $to_port -h $to_host -U $to_user -p $to_port $to_db 2>&1 1>/dev/null
         createdb -p $to_port -h $to_host -U $to_user -p $to_port $to_db
-        pg_dump -p $from_port -h $from_host -U $from_user $from_db -O -x | psql  -p $to_port -h $to_host -U $to_user $to_db
+        pg_dump -p $from_port -h $from_host -U $from_user $from_db -O -x $DUMP_EXTRA_ARGS | psql  -p $to_port -h $to_host -U $to_user $to_db
     else
         echo ""
         echo "Modo de uso: "
