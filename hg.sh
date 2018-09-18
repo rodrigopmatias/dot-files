@@ -70,7 +70,7 @@ function _hgmodified_do {
     name=$1
 
     echo -en " \033[1m\033[32m•\033[0m Check changes in repository \033[1m$name\033[0m ... "
-    rst=$(hg st -0)
+    rst=$(hg st)
 
     if [ "$rst" == "" ]; then
         echo -e "\033[1m\033[32m(ok)\033[0m"
