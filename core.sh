@@ -39,18 +39,55 @@ function dotunset
 function dotreload
 {
     source $BASH_RC_FILE
+    ___dotaliasload
     echo "reloaded!!!"
+}
+
+function dotalias() {
+    if [ "$#" -eq "2" ]; then
+        $(___dotdb "INSERT INTO aliastable(attr, value) VALUES('$1', '$2')")
+    else
+        echo "Modo de uso:"
+        echo
+        echo "  $0 [aliasname] [aliasvalue]"
+    fi
+}
+
+function dotaliasdel() {
+    if [ "$#" -eq "1" ]; then
+        $(___dotdb "DELETE FROM aliastable WHERE attr='$1'")
+    else
+        echo "Modo de uso:"
+        echo
+        echo "  $0 [aliasname]"
+    fi
+}
+
+function ___dotaliasload() {
+    tmpfile=$(tempfile)
+    echo $(___dotdb "SELECT * FROM aliastable") > $tmpfile
+
+    while read row
+    do
+        attr=$(echo $row | cut -d '|' -f 2)
+        value=$(echo $row | cut -d '|' -f 3)
+
+        alias $attr="$value"
+    done <$tmpfile
+
+    rm $tmpfile
 }
 
 function ___dotdbinit
 {
     SQLITE_BINARY=$(type -p sqlite3)
 
-    if [ -f "$DB_FILE" ]; then
+    if [ -f "$DB_FILE" -a "$DOT_IGNORE" == "" ]; then
         echoer "the database already exists!!!"
     else
         if [ "$SQLITE_BINARY" != "" ]; then
-            $SQLITE_BINARY $DB_FILE "CREATE TABLE configtable(id interge auto increment, attr varchar(60) unique not null, value varchar(200) not null)"
+            $SQLITE_BINARY $DB_FILE "CREATE TABLE IF NOT EXISTS configtable(id interge auto increment, attr varchar(60) unique not null, value varchar(200) not null)"
+            $SQLITE_BINARY $DB_FILE "CREATE TABLE IF NOT EXISTS aliastable(id interge auto increment, attr varchar(60) unique not null, value varchar(200) not null)"
         else
             echoer "sqlite3 is not installed!!!"
             echoer "install with apt-get install sqlite3"
