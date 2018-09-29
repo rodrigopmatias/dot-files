@@ -82,10 +82,11 @@ function ___dotdbinit
 {
     SQLITE_BINARY=$(type -p sqlite3)
 
-    if [ -f "$DB_FILE" -a "$DOT_IGNORE" == "" ]; then
+    if [ -f "$DB_FILE" -a "$DOT_DB_IGNORE" == "" ]; then
         echoer "the database already exists!!!"
     else
         if [ "$SQLITE_BINARY" != "" ]; then
+            echoer "prepare tables..."
             $SQLITE_BINARY $DB_FILE "CREATE TABLE IF NOT EXISTS configtable(id interge auto increment, attr varchar(60) unique not null, value varchar(200) not null)"
             $SQLITE_BINARY $DB_FILE "CREATE TABLE IF NOT EXISTS aliastable(id interge auto increment, attr varchar(60) unique not null, value varchar(200) not null)"
         else
@@ -102,7 +103,7 @@ function ___dotdb
         echoer "sqlite3 is not installed!!!"
         echoer "install with apt-get install sqlite3"
     else
-        if [ ! -f "$DB_FILE" ]; then
+        if [ ! -f "$DB_FILE" -o "$DOT_DB_IGNORE" == "1" ]; then
             echoer "the database not exists"
             echoer "create database!!!"
             ___dotdbinit
