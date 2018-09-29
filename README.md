@@ -23,6 +23,6 @@ Alguns comandos dependem do **sqlite3** veja como instalar este em sua distribui
 
 Recentemente foi adicionado uma nova funcionalidade no pacote core, nele foi adicionado um gerenciador de alias, e com isto foi adicionado uma nova tabela na base de dados, para que a mesma seja criada é necessário rodar o comando **___dotdbinit** com a flag ignore, veja como:
 
-<pre><code> $ DOT_IGNORE=1 dotreload</code></pre>
+<pre><code> $ DOT_DB_IGNORE=1 dotreload</code></pre>
 
  Com este comando caso você já tivesse o banco de dados iniciado ele irá tentar criar as tabelas novamente caso elas não existão.
