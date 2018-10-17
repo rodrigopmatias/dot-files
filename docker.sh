@@ -26,14 +26,14 @@ function dkclear() {
     docker volume rm $(docker volume ls | awk {'print $2'})
 }
 
-function dkcontainer() {
+function dkfind() {
     echo $(docker ps -f "name=$1" --format "{{.ID}}") | cut -d ' ' -f 1
 }
 
 function  dkexec() {
   name=$1
   shift 1
-  docker exec -it $(dkcontainer $name) $@
+  docker exec -it $(dkfind $name) $@
 }
 
 function dktailf() {
@@ -46,3 +46,25 @@ function dkrestart() {
         shift 1
     done
 }
+
+function ___dklist() {
+    local scope=$1
+    local filter=$2
+    local list=""
+    local current=${COMP_WORDS[COMP_CWORD]}
+
+    if [ $COMP_CWORD -eq 1 ]; then
+        if [[ -z "$filter" ]]; then
+            list=$(docker service ls --format "{{.Name}}")
+        else
+            list=$(docker service ls --format "{{.Name}}" | grep $filter)
+        fi
+
+        COMPREPLY=( $(compgen -W "$list" $current) )
+    fi
+}
+
+complete -F ___dklist dkexec
+complete -F ___dklist dktailf
+complete -F ___dklist dkrestart
+complete -F ___dklist dkfind
