@@ -39,7 +39,6 @@ function dotunset
 function dotreload
 {
     source $BASH_RC_FILE
-    ___dotaliasload
     echo "reloaded!!!"
 }
 
@@ -65,7 +64,7 @@ function dotaliasdel() {
 
 function ___dotaliasload() {
     tmpfile=$(tempfile)
-    echo $(___dotdb "SELECT * FROM aliastable") > $tmpfile
+    ___dotdb "SELECT * FROM aliastable" > $tmpfile
 
     while read row
     do
@@ -186,3 +185,5 @@ function dotstream
 {
     tail -f --bytes=0 $@
 }
+
+___dotaliasload

@@ -170,9 +170,7 @@ function pgrecreate {
         echo ""
         echo "Modo de uso: "
         echo ""
-        echo "  pgrecreate [database]"
         echo "  pgrecreate [database] [template]"
-        echo "  pgrecreate user@host[:port]/dbdest"
         echo "  pgrecreate user@host[:port]/dbdest template"
         echo ""
     fi
