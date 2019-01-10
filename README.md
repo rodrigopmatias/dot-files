@@ -7,7 +7,7 @@ Modo de uso
 Inicialmente precisamos configurar a variável que indica onde esta instalado o **dot-files**, adicone a seguinte linha em seu **.bashrc** que esta em seu diretório HOME.
 
 <pre><code>...
-EXPORT DOT_FILES_HOME="[path onde foi clonado o dot-files]"
+export DOT_FILES_HOME="[path onde foi clonado o dot-files]"
 ...</code></pre>
 
 O próximo passo é dizer para o bash carregar o nosso ambiente, iremos editar o arquivo .bashrc que esta no home do seu usuário e adicone as seguintes linhas:
