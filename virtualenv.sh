@@ -107,5 +107,9 @@ function ___dotenvlist_autocomplete
     COMPREPLY=( $(compgen -W "$list" $current ) )
 }
 
-complete -F ___dotenvlist_autocomplete envon
-complete -F ___dotenvlist_autocomplete on
+type complete 2>&1 1>/dev/null
+
+if [ $? -eq 0 ]; then
+    complete -F ___dotenvlist_autocomplete envon
+    complete -F ___dotenvlist_autocomplete on
+fi
