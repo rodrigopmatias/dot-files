@@ -63,7 +63,7 @@ function dotaliasdel() {
 }
 
 function ___dotaliasload() {
-    tmpfile=$(tempfile)
+    tmpfile=$(__tmpfilename)
     ___dotdb "SELECT * FROM aliastable" > $tmpfile
 
     while read row
@@ -184,6 +184,21 @@ complete -F ___dotcd_autocomplete dotcd
 function dotstream
 {
     tail -f --bytes=0 $@
+}
+
+function usbcreate
+{
+  size=$(stat --print %s $1)
+  dd if=$1 | pv -s $size | sudo dd of=$2 bs=8M
+}
+
+function __tmpfilename
+{
+  if [ -f "/usr/bin/mktemp" ]; then
+    mktemp
+  else
+    tmpfile
+  fi
 }
 
 ___dotaliasload
