@@ -179,7 +179,11 @@ function ___dotcd_autocomplete
     COMPREPLY=( $(compgen -W "$list" $current ) )
 }
 
-complete -F ___dotcd_autocomplete dotcd
+type complete 2>&1 1>/dev/null
+
+if [ $? -eq 0 ]; then
+    complete -F ___dotcd_autocomplete dotcd
+fi
 
 function dotstream
 {
@@ -198,6 +202,34 @@ function __tmpfilename
     mktemp
   else
     tmpfile
+  fi
+}
+
+function mkpasswd
+{
+  hash=$1
+  size=$2
+  seed_size=$3
+
+  if [ "$seed_size" == "" ]; then
+    seed_size="8M"
+  fi
+
+  if [ "$hash" == "" ]; then
+    hash="md5"
+  fi
+
+  stage_one=$(dd if=/dev/urandom count=1 bs=$seed_size 2>/dev/null | ${hash}sum | base64 -w 0)
+
+  if [ "$size" == "" ]; then
+    echo $stage_one
+  else
+    length=${#stage_one}
+    max_start=$(($length - $size))
+    random_start=$(((RANDOM % max_start) + 1))
+    random_end=$(( random_start + size ))
+
+    echo ${stage_one:$random_start:$size}
   fi
 }
 

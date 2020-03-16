@@ -64,7 +64,11 @@ function ___dklist() {
     fi
 }
 
-complete -F ___dklist dkexec
-complete -F ___dklist dktailf
-complete -F ___dklist dkrestart
-complete -F ___dklist dkfind
+type complete 2>&1 1>/dev/null
+
+if [ $? -eq 0 ]; then
+    complete -F ___dklist dkexec
+    complete -F ___dklist dktailf
+    complete -F ___dklist dkrestart
+    complete -F ___dklist dkfind
+fi
