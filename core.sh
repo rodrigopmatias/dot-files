@@ -6,7 +6,7 @@
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
+# copies of the Software, and to permit persons to whom the Software is+
 # furnished to do so, subject to the following conditions:
 #
 # The above copyright notice and this permission notice shall be included in all
@@ -192,45 +192,52 @@ function dotstream
 
 function usbcreate
 {
-  size=$(stat --print %s $1)
-  dd if=$1 | pv -s $size | sudo dd of=$2 bs=8M
+    if [ $# -eq 2 ]; then
+        size=$(stat --print %s $1)
+        dd if=$1 | pv -s $size | sudo dd of=$2 bs=8M
+    else
+        echo "Modo de uso:"
+        echo ""
+        echo "  usbcreate [iso] [device]"
+        echo ""
+    fi
 }
 
 function __mktempfile
 {
-  if [ -f "/usr/bin/mktemp" -o -f "/bin/mktemp" ]; then
-    mktemp
-  else
-    tmpfile
-  fi
+    if [ -f "/usr/bin/mktemp" -o -f "/bin/mktemp" ]; then
+        mktemp
+    else
+      tmpfile
+    fi
 }
 
 function mkpasswd
 {
-  hash=$1
-  size=$2
-  seed_size=$3
+    hash=$1
+    size=$2
+    seed_size=$3
 
-  if [ "$seed_size" == "" ]; then
-    seed_size="8M"
-  fi
+    if [ "$seed_size" == "" ]; then
+        seed_size="8M"
+    fi
 
-  if [ "$hash" == "" ]; then
-    hash="md5"
-  fi
+    if [ "$hash" == "" ]; then
+        hash="md5"
+    fi
 
-  stage_one=$(dd if=/dev/urandom count=1 bs=$seed_size 2>/dev/null | ${hash}sum | base64 -w 0)
+    stage_one=$(dd if=/dev/urandom count=1 bs=$seed_size 2>/dev/null | ${hash}sum | base64 -w 0)
 
-  if [ "$size" == "" ]; then
-    echo $stage_one
-  else
-    length=${#stage_one}
-    max_start=$(($length - $size))
-    random_start=$(((RANDOM % max_start) + 1))
-    random_end=$(( random_start + size ))
+    if [ "$size" == "" ]; then
+        echo $stage_one
+    else
+        length=${#stage_one}
+        max_start=$(($length - $size))
+        random_start=$(((RANDOM % max_start) + 1))
+        random_end=$(( random_start + size ))
 
-    echo ${stage_one:$random_start:$size}
-  fi
+        echo ${stage_one:$random_start:$size}
+    fi
 }
 
 ___dotaliasload
