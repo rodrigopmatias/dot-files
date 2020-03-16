@@ -63,7 +63,7 @@ function dotaliasdel() {
 }
 
 function ___dotaliasload() {
-    tmpfile=$(__tmpfilename)
+    tmpfile=$(__mktempfile)
     ___dotdb "SELECT * FROM aliastable" > $tmpfile
 
     while read row
@@ -196,9 +196,9 @@ function usbcreate
   dd if=$1 | pv -s $size | sudo dd of=$2 bs=8M
 }
 
-function __tmpfilename
+function __mktempfile
 {
-  if [ -f "/usr/bin/mktemp" ]; then
+  if [ -f "/usr/bin/mktemp" -o -f "/bin/mktemp" ]; then
     mktemp
   else
     tmpfile
