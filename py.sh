@@ -20,11 +20,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# load all modules
-source $DOT_FILES_HOME/core.sh
-source $DOT_FILES_HOME/virtualenv.sh
-source $DOT_FILES_HOME/install.sh
-source $DOT_FILES_HOME/hg.sh
-source $DOT_FILES_HOME/pg.sh
-source $DOT_FILES_HOME/docker.sh
-source $DOT_FILES_HOME/py.sh
+PYENV_HOME="${HOME}/.pyenv"
+
+function pyon
+{
+    activate="$PYENV_HOME/${1}/bin/activate"
+
+    if [ -f "$activate" ]; then
+        source ${activate}
+    else
+        echo "Python environment not exists create on $PYENV_HOME"
+    fi
+}
